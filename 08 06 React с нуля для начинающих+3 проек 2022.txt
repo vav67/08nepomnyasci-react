@@ -1,0 +1,462 @@
+==========001 Презентация проекта
+==========002 Обзор API, что доступно, как использовать
+===========003 Подготовка проекта, шапка и футер
+https://fortniteapi.io/
+alexvav
+alelolxolx@gmail.com
+525868Vav
+
+API KEY (Authorization header)
+a6480480-5721ec60-becad20f-1eccc49c
+------
+https://www.postman.com/pricing/
+alelolxolx@gmail.com
+alexvav
+525868Vav
+имя - alexvav
+role - Fullstack Developer
+name FortniteApi.io
+
+GET https://fortniteapi.io/v2/shop?lang=en
+-----------------------------------------------
+KEY                                 VALUE
+Authorization                      a6480480-5721ec60-becad20f-1eccc49c
+"Send"
+получим данные из fortniteapi.io
+https://martian-sunset-621372.postman.co/workspace/My-Workspace~65171c6f-6460-41f9-8276-db29e81fe801/request/create?requestId=39e16de4-352d-4e04-9e26-4c5bc8faf31e
+Будем загружать товары и добавлять в корзину 
+===========================================================================
+создали папку
+вин термина cmd
+cd перешли в каталог
+выполнили
+npx create-react-app papka    в какую папку установить 
+npx create-react-app .        в текущую
+открыли  шторм и проект в этой папке
+теминал , 
+запустим сервер npm start
+открылся шаблон реакта
+
+   02 - React с JSX и без
+==========================================================================================
+созадим в каталоге public/index.html
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+и иконки
+------.env.local 
+REACT_APP_API_KEY=a6480480-5721ec60-becad20f-1eccc49c на https://dashboard.fortniteapi.io/
+------config.js
+const API_KEY = process.env.REACT_APP_API_KEY
+const API_URL =  'https://fortniteapi.io/v2/shop?lang=ru'
+//УРЛ берем из https://fortniteapi.io / Get daily shop  List all items 
+//currently in the shop
+export  { API_KEY, API_URL }
+------- App.js
+import React from "react";
+import { StrictMode } from 'react'
+import {Header} from  './components/Header'
+import {Footer} from  './components/Footer'
+import {Shop} from  './components/Shop'
+function App()  { return (
+        <StrictMode> <React.Fragment>
+                <Header/> <Shop /> <Footer/>
+            </React.Fragment> </StrictMode>
+    )  }
+export default App;
+npm start
+Теперь запросим список товара по ссылке  'https://fortniteapi.io/v2/shop?lang=ru'
+и вывести их 
+
+----------------- 004 Вывод списка товаров
+=========================================================================
+-----------Shop.jsx магазин загрузка
+все будем делать на хуках(с классами не будем работать)
+function  Shop() {
+// создадим два ключа
+ // список торов и ф-я обновления, изнача пуст массив
+  const [goods, setGoods] = useState([])
+ //состояние загрузки
+    const [loading, setLoading] = useState(true)
+//получает некую ф-ию и некий массив зависимостей
+    useEffect( () => {}, [] )
+...
+---- Preloader.jsx прелоадер
+нужен компонент который получит список товара
+------GoodList.jsx
+function GoodList(props) {
+  //массив всех товаров
+    const {goods = [] } =props
+} export {GoodList}
+------GoodsItem.jsx карточка
+-----------Shop.jsx магазин загрузка
+//получает некую ф-ию и некий массив зависимостей
+//пустой массив - операция выполняется один раз
+    useEffect( function  getGoods() {
+      fetch(API_URL, {
+            headers: {  'Authorization': API_KEY  }
+      }).then((response) => response.json())
+        .then((data) => {
+        data.featured && setGoods(data.featured)
+          setLoading(false)
+          })
+    }, [] )
+
+---------------- 005 Состояние заказа, иконка корзины
+================================================================================
+-----sec/components/Cart.jsx
+function Cart(props) {
+    const { quantity = 0, handleBasketShow = Function.prototype } = props;
+---------- index.css
+/* корзина */
+
+.cart {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+
+  cursor: pointer;
+  z-index: 5;
+  padding: 1rem;
+}
+@media (min-width: 767px)  {
+  .cart {
+    top: 5rem;
+    bottom: unset;
+  }
+
+}
+
+---------shop.jsx
+ // заказы
+  const [order, setOrder ] = useState([])
+
+------------- 006 Решение функция добавления товара в заказ
+=================================================================================данные
+данные:товары 01:20
+ // заказы  const [order, setOrder ] = useState([])
+напишем ф-ю на уровне магазина
+-------- Shop.jsx
+                  // заказы
+  const [order, setOrder ] = useState([])
+// ф-я добавления заказа (принимает один эемент товара)
+  const addToBasket = (item) => {
+    // вначале проверка, а есть ли такой товар orderItem
+    // -1 нету или число попорядку-есть
+      const itemIndex = order.findIndex( (orderItem) => orderItem.id === item.id);
+//ф-я  addToBasket спускается ниже
+...
+ <GoodsList goods={goods} addToBasket={addToBasket} />
+...
+------- GoodList.jsx
+сюда ф-я addToBasket приходит
+function GoodList(props) {
+  //массив всех товаров и ф-я заказа
+// и по умолчанию как заглушка Function.prototype
+    const {goods = [], addToBasket = Function.prototype } = props
+и    // передадим дальше addToBasket
+
+   return <div className="goods" >
+       { goods.map((item) => (
+      <GoodsItem key={item.id} {...item}  addToBasket={addToBasket}/>
+           ) )}  </div>
+------------ GoodsItem.jsx
+function GoodsItem(props){ const {id, name, description,
+       price, full_background,  addToBasket = Function.prototype } = props
+и повесим ф-ю на кнопку батон
+            <div className="card-action">
+  <button className= 'btn'
+    onClick={ () => addToBasket({  id,  name, price }) }
+                >Купить</button>
+
+--------------- 007 Создание корзины, пересчет суммы заказа в корзине
+=========================================================================
+корзина будем открывать либо скрывать
+добавим состояние- видим корзину или нет
+-------- Shop.jsx
+ // isBasketShow-видим или нетб   setBasketSow-ф-я обновления
+ const [isBasketShow, setBasketSow] = useState(false);
+    const handleBasketShow = () => {
+        setBasketSow(!isBasketShow);
+    };
+добавим и спустим в наш Cart
+     <Cart quantity={order.length}  handleBasketShow={handleBasketShow} />
+-------- Cart.jsx
+function Cart(props) {
+    const { quantity = 0, handleBasketShow = Function.prototype } = props;
+при клике будем вызывать handleBasketShow 
+    return ( <div             className='cart blue darken-4 white-text'
+            onClick={handleBasketShow} 
+нужен отдльный компонент для корзины BasketList
+и один элемент корзины BasketItem
+-------------BasketList.jsx
+корзина в виде списка
+function BasketList(props) { const {order} = props  //приходит список заказов
+return (
+    <ul className="collection">
+        <li  className="collection-item active">Корзина</li>
+----------------------BasketItem.jsx
+function BasketItem(props) {
+    //приходит
+  const { id, name, price, quantity } = props
+
+  return (
+        <li  className="collection-item">
+            {name}  x  {quantity} = {price}
+            <li className="collection-item">
+    <span> className="secondary-content">
+        <i className="material-icons">close</i></span>
+            </li>
+        </li>
+  )
+Корзина должна быть как всплывающее окно
+стилизуем
+------------BasketList.jsx
+function BasketList(props) {
+return ( <ul className="collection bsscet-list">
+               <li className="collection-item active">Корзина</li>
+прицепим иконку для закрытия
+     <i  className='material-icons basket-close'
+                onClick={handleBasketShow}  >  close  </i>
+-------index.css
+всплывающее окно
+.basket-list {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background-color: #fff;
+    width: 50rem;
+    max-width: 95%;
+
+    box-shadow: inset -1px 3px 8px 5px #1f87ff, 2px 5px 16px 0px #0b325e,
+        5px 5px 15px 5px rgba(0, 0, 0, 0);
+
+    animation: show 500ms ease-in-out;
+}
+ стилизуем крестик закрытия корзины 
+.basket-close {
+  cursor: pointer;
+   position: absolute;  позиционируем
+  top: 0.5rem;
+  right: 0.5rem;
+  color: #fff;
+}
+------------BasketList.jsx
+посчитаем общую стоимость в корзине
+     const totalPrice = order.reduce((sum, el) => {
+        return sum + el.price * el.quantity;
+    }, 0);
+и выведим  return (
+    <ul className="collection basket-list"> 
+     ...
+  <li  className="collection-item active">Всего:{totalPrice} грн.</li>
+
+-------- 008 Функция удаления товара из корзины
+========================================================================
+т к информация о заказе хранится на уровне магазина 
+---------- Shop.jsx
+ // удаление из корзины
+    const removeFromBasket = (itemId) => {
+  const newOrder = order.filter((el) => el.id !== itemId);
+        setOrder(newOrder); // запишем      };
+передадим 
+    return (
+        <main className="container content">
+...
+    { isBasketShow && ( 
+        <BasketList    order={order}
+          handleBasketShow = {handleBasketShow}
+          removeFromBasket = {removeFromBasket}    
+            />    ) }
+------------- BasketList.jsx 
+  //приходит список заказов
+    const { order = [],
+        handleBasketShow = Function.prototype,
+        removeFromBasket = Function.prototype,
+        incQuantity,
+        decQuantity
+    } =props
+.......
+return (  <ul className="collection basket-list">
+.......
+         order.map((item) => (
+                <BasketItem
+                    key={item.id}
+                    removeFromBasket={removeFromBasket}
+передадим в каждый итем
+----------------- BasketItem.jsx
+function BasketItem(props) {
+    //приходит
+  const { id, name, price, quantity,
+      removeFromBasket = Function.prototype
+        } = props
+...
+ <span className="secondary-content" onClick={
+        () => removeFromBasket(id)}>
+        <i className="material-icons basket-delete ">close</i>
+             </span>
+-------- index.css
+добавим анимации
+.basket-list {
+...
+  animation: show 500ms ease-in-out; добавим анимвцию show
+}
+@keyframes show {
+  from {
+    top: 70%;
+    opacity: 0;
+  }
+  to {     top: 50%;
+    opacity: 1;
+  }
+}
+
+------------------ 009 Решение Изменение количества товара в корзине
+================================================================================
+делаем кнопки +- изменения товара в корзине
+//корзина +- кол-во товара
+    const incQuantity = (itemId) => {
+    // обойдем текущ ордер
+        const newOrder = order.map((el) => {
+            if (el.id === itemId) {
+..............
+    <BasketList передадим
+...
+          incQuantity={incQuantity}
+          decQuantity={decQuantity}
+------------- BasketList.jsx 
+function BasketList(props) {
+... принимаем
+        incQuantity,
+        decQuantity
+    } =props
+и передадим в корзину
+return ...
+         <BasketItem
+                    key={item.id}
+                    removeFromBasket={removeFromBasket}
+                    incQuantity={incQuantity}
+                    decQuantity={decQuantity}
+----------------- BasketItem.jsx
+function BasketItem(props) {
+    //приходит
+  const { id, name, price, quantity,
+      removeFromBasket = Function.prototype,
+      incQuantity = Function.prototype,
+      decQuantity = Function.prototype,
+        } = props
+повесим на две дополнительнве кнопочки
+из  иконок
+   {name}  {' '}
+            <i className='material-icons basket-quantity'
+               onClick={() => decQuantity(id)}
+            >
+                remove
+            </i> 
+добавим
+   <li  className="collection-item">
+            {name}  {' '}
+            <i className='material-icons basket-quantity'
+               onClick={() => decQuantity(id)}
+            >remove</i>
+            x  {quantity}
+             <i className='material-icons basket-quantity'
+                onClick={() => incQuantity(id)}
+            > add  </i>{' '}
+            по  {price} грн.
+
+
+
+-------- index.css
+.basket-quantity {
+    cursor: pointer;
+    vertical-align: middle;
+    color: #26a69a;
+}
+
+#toast-container {
+    top: 3rem !important;
+    animation: fade-in 250ms ease-in-out;
+}
+
+------010 Добавление подсказки о добавлении товара
+===============================================================
+-------Shop.jsx
+//Отображение - показывать когда имя записываем
+ const [alertName, setAlertName] = useState( '')
+
+ const closeAlert = () => {
+     setAlertName( '') //устанавливать пустую строку
+ }
+
+------ Alert.jsx
+по таймерй будем скрывать  useEffect( () => {}, [name])
+если новое имя сбрасываем таймер
+   useEffect(() => {
+        const timerId = setTimeout(closeAlert, 3000);
+      // ф-я очистки передаем таймер айди
+        return () => {  clearTimeout(timerId)  }
+      }, [name]);
+появиться подсказка что было добавлено в корзину
+ <div id='toast-container'>
+            <div className='toast'>{name} добавлен в корзину</div>
+        </div>
+-------Shop.jsx
+import { Alert } from  './Alert'
+передаем
+ { alertName && <Alert name={alertName} closeAlert = {closeAlert} /> }
+и добавим в
+// ф-я добавления заказа (принимает один эемент товара)
+  const addToBasket = (item) => {
+... при добавлении в корзину
+...   
+      setAlertName(item.name)   // сообщение что добавлено
+  } // конец добавления заказа
+---- index.css
+стилизуем
+#toast-container {
+  top: 3rem !important;
+  animation: fade-in 250ms ease-in-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0rem);
+  }
+}
+
+-------------------  011 Публикация проекта на GitHub Pages
+==================================================================================
+New  08nepomnyasci-react
+git add -A
+git commit -m "comment"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
