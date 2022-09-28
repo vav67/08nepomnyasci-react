@@ -435,6 +435,58 @@ import { Alert } from  './Alert'
 New  08nepomnyasci-react
 git add -A
 git commit -m "comment"
+git remote add origin https://github.com/vav67/08nepomnyasci-react.git предлагают
+                      git push -u origin main предлагаю но меняем на
+git push -u origin master
+переобновили браузер
+Settings - Secrets - Actions - new repositori secret
+.env.local
+REACT_APP_API_KEY=a6480480-5721ec60-becad20f-1eccc49c
+сохранили
+     npm i gh-pages --save-dev некая зависимость но
+на
+  npm i gh-pages -D
+позволяет сделать команду деплой
+---------- package.json
+
+"homepage": "https://vav67.github.io/05nepomnyasci-react",
+
+  "scripts": {
+...
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+                  "deploy": "gh-pages -d build" укажем на какую ветку загружать в
+гитхабе (build собирается в папку "build" то мы ее и будем отправлять на
+соответствующую ветку, также команда  "predeploy": "npm run build", удобно 
+запускать ( хитро сделано (приставка pre): запуск 'deploy' и 
+затем автомат 'predeploy' )
+Поэтому когда запустим npm run deploy то запуститься "predeploy" а затем 'deploy'
+- что сформирует папку build и отправит на гитхаб страницу
+Теперь у нашего проекта планируется официалиный сайт, будет лежать на гитхабе
+"homepage": "https://vav67.github.io/05nepomnyasci-react",
+npm run deploy
+добавилась ветка gh-pages соответсвенно эта ветка должна быть включена в
+Settings - Pages  "Build and deployment"  -> gh-pages    /root  ...
+и выше ссылочка возле Visit site   "https://vav67.github.io/08nepomnyasci-react/"
+Еще подправим ссылочки в проекте
+--------- Header.jsx
+ <a href='/' className="brand-logo">React Shop</a>
+... ссылка на репозиторий
+ <li><a href= 'https://github.com/vav67/08nepomnyasci-react'
+                       target='_blank' rel="noreferrer" > Repozitori</a></li>
+            </ul>
+-------- Footer.jsx
+        © {new Date().getFullYear()} Copyright Text
+                <a className="grey-text text-lighten-4 right" 
+                  href= 'https://github.com/vav67/08nepomnyasci-react'
+                  target='_blank' 
+                  rel="noreferrer"
+                  >Repozitori</a>
+git add -A
+git commit -m "Gh-pages"
+git push
+
+
 
 
 
